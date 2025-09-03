@@ -15,10 +15,12 @@
               </div>
             </div>
           </label>
-          <input id="imageUploader" class="hidden" type="file" @change="onFileUpdated" />
+          <input id="imageUploader" class="hidden" type="file" @change="onFileUpdated" accept=".png, .jpg, .jpeg, image/png, image/jpeg" />
         </div>
-        <div v-if="inputs.file" class="flex justify-center">
-          <ButtonActionView label="Filter" :action="doFilter" />
+        <div v-if="inputs.file" class="flex gap-2 md:grid justify-center items-center">
+          <div class="flex justify-center">
+            <ButtonActionView label="Filter" :action="doFilter" />
+          </div>
         </div>
         <div class="relative block w-[300px] h-[300px] rounded-xl shadow-md bg-white/80 overflow-hidden">
           <img v-if="resultURL" :src="resultURL" class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2" />
@@ -26,8 +28,14 @@
             <div class="text-[80px] font-bold" :class="resultURL ? ' text-white' : 'text-gray-500'">18+7</div>
           </div>
           <div v-if="resultURL" class="flex justify-center items-center absolute bottom-5 left-1/2 -translate-x-1/2">
-            <a :href="resultURL" class="px-3 py-1 rounded-full font-bold bg-[#1b602f] text-[#f784c5] text-sm" download="18+7.png">Download</a>
+            <ButtonActionView label="Download" :action="doDownload" />
           </div>
+        </div>
+      </div>
+      <div v-if="isError" class="flex justify-center">
+        <div class="bg-red-800 px-3 py-1 rounded-xl text-sm text-white">
+          <div class="whitespace-nowrap font-semibold">Waduh Error</div>
+          <div class="text-xs text-white/80">Boleh ulangi dengan gambar yang berbeda ya, klik kembali gambar untuk memilih gambar lainnya.</div>
         </div>
       </div>
       <div class="grid gap-3 md:gap-5 mt-2 text-center text-white whitespace-nowrap">
@@ -43,11 +51,13 @@ const api = useApi();
 
 const inputs = ref({});
 
+const isError = ref(false);
 const countdown = ref(null);
 const choosedImageURL = ref(null);
 const resultURL = ref(null);
 
 const onFileUpdated = (e) => {
+  isError.value = false;
   const file = e.target.files[0];
   if (file) {
     inputs.value.file = file;
@@ -59,15 +69,31 @@ const onFileUpdated = (e) => {
 };
 
 const doFilter = async () => {
-  const requestBody = new FormData();
-  requestBody.append("image", inputs.value.file);
+  try {
+    isError.value = false;
+    const requestBody = new FormData();
+    requestBody.append("image", inputs.value.file);
 
-  // melakukan hit ke endpoint brave hero
-  // sementara nebeng ke endpoint paytive
-  const response = await api.post("v1/bravehero/filter", requestBody, null, false, "blob");
+    // melakukan hit ke endpoint brave hero
+    // sementara nebeng ke endpoint paytive
+    const response = await api.post("v1/bravehero/filter", requestBody, null, false, "blob");
 
-  // mengubah response ke blob
-  resultURL.value = URL.createObjectURL(response);
+    // mengubah response ke blob
+    resultURL.value = URL.createObjectURL(response);
+  } catch (err) {
+    isError.value = true;
+    console.log(err);
+  }
+};
+
+const doDownload = () => {
+  if (!resultURL.value) return;
+  const link = document.createElement("a");
+  link.href = resultURL.value;
+  link.download = "18+7.png"; // file name
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
 };
 
 function updateCountdown() {
@@ -76,11 +102,6 @@ function updateCountdown() {
   const target = new Date(`${year}-09-05T00:00:00`);
 
   const diff = target - now;
-
-  if (diff <= 0) {
-    document.getElementById("countdown").textContent = "Waktu Habis";
-    return;
-  }
 
   const seconds = Math.floor(diff / 1000) % 60;
   const minutes = Math.floor(diff / 1000 / 60) % 60;
