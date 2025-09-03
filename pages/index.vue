@@ -88,12 +88,13 @@ const doFilter = async () => {
 
 const doDownload = () => {
   if (!resultURL.value) return;
-  const link = document.createElement("a");
-  link.href = resultURL.value;
-  link.download = "18+7.png"; // file name
-  document.body.appendChild(link);
-  link.click();
-  document.body.removeChild(link);
+  window.open(resultURL.value, "_blank");
+  // const link = document.createElement("a");
+  // link.href = resultURL.value;
+  // link.download = "18+7.png"; // file name
+  // document.body.appendChild(link);
+  // link.click();
+  // document.body.removeChild(link);
 };
 
 function updateCountdown() {
