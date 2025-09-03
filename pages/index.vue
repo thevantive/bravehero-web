@@ -40,7 +40,7 @@
       </div>
       <div v-if="isToggled" class="flex justify-center">
         <div class="bg-yellow-800 px-3 py-1 rounded-xl text-sm text-white">
-          <div class="whitespace-nowrap font-semibold">Download tidak didukung pada Webview</div>
+          <div class="whitespace-nowrap font-semibold">Download tidak tersedia pada Webview</div>
           <div class="text-xs text-white/80">Mohon untuk menggunakan browser lainnya</div>
         </div>
       </div>
