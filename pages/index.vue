@@ -44,6 +44,12 @@
           <div class="text-xs text-white/80">Mohon untuk menggunakan browser lainnya</div>
         </div>
       </div>
+      <div v-if="isDownloaded" class="flex justify-center">
+        <div class="bg-green-800 px-3 py-1 rounded-xl text-sm text-white">
+          <div class="whitespace-nowrap font-semibold">Download gambar 17+8 berhasil</div>
+          <div class="text-xs text-white/80">Periksa galeri atau media penyimpanan anda</div>
+        </div>
+      </div>
       <div class="grid gap-3 md:gap-5 mt-2 text-center text-white whitespace-nowrap">
         <div class="font-semibold text-[20px] md:text-[40px]">{{ countdown }}</div>
         <div class="font-bold text-[30px] md:text-[60px] leading-5">5 September 2025</div>
@@ -57,6 +63,7 @@ const api = useApi();
 
 const inputs = ref({});
 
+const isDownloaded = ref(false);
 const isError = ref(false);
 const isToggled = ref(false);
 
@@ -66,6 +73,8 @@ const resultURL = ref(null);
 
 const onFileUpdated = (e) => {
   isError.value = false;
+  isDownloaded.value = false;
+  isToggled.value = false;
   const file = e.target.files[0];
   if (file) {
     inputs.value.file = file;
@@ -79,6 +88,8 @@ const onFileUpdated = (e) => {
 const doFilter = async () => {
   try {
     isError.value = false;
+    isDownloaded.value = false;
+    isToggled.value = false;
     const requestBody = new FormData();
     requestBody.append("image", inputs.value.file);
 
@@ -102,10 +113,11 @@ const doDownload = () => {
   if (!resultURL.value) return;
   const link = document.createElement("a");
   link.href = resultURL.value;
-  link.download = "18+7.png"; // file name
+  link.download = "18+7.png";
   document.body.appendChild(link);
   link.click();
   document.body.removeChild(link);
+  isDownloaded.value = true;
 };
 
 const isInAppBrowser = computed(() => {
