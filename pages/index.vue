@@ -25,7 +25,7 @@
         <div class="relative block w-[300px] h-[300px] rounded-xl shadow-md bg-white/80 overflow-hidden">
           <img v-if="resultURL" :src="resultURL" class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2" />
           <div v-if="!isToggled" class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
-            <div class="text-[80px] font-bold" :class="resultURL ? ' text-white' : 'text-gray-500'">18+7</div>
+            <div class="text-[80px] font-bold" :class="resultURL ? ' text-white' : 'text-gray-500'">17+8</div>
           </div>
           <div v-if="resultURL && !isToggled" class="flex justify-center items-center absolute bottom-5 left-1/2 -translate-x-1/2">
             <ButtonActionView label="Download" :action="doDownload" />
@@ -113,7 +113,7 @@ const doDownload = () => {
   if (!resultURL.value) return;
   const link = document.createElement("a");
   link.href = resultURL.value;
-  link.download = "18+7.png";
+  link.download = "17+8.png";
   document.body.appendChild(link);
   link.click();
   document.body.removeChild(link);
