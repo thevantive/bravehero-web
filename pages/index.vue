@@ -24,10 +24,10 @@
         </div>
         <div class="relative block w-[300px] h-[300px] rounded-xl shadow-md bg-white/80 overflow-hidden">
           <img v-if="resultURL" :src="resultURL" class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2" />
-          <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
+          <div v-if="!isToggled" class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
             <div class="text-[80px] font-bold" :class="resultURL ? ' text-white' : 'text-gray-500'">18+7</div>
           </div>
-          <div v-if="resultURL" class="flex justify-center items-center absolute bottom-5 left-1/2 -translate-x-1/2">
+          <div v-if="resultURL && !isToggled" class="flex justify-center items-center absolute bottom-5 left-1/2 -translate-x-1/2">
             <ButtonActionView label="Download" :action="doDownload" />
           </div>
         </div>
@@ -36,6 +36,12 @@
         <div class="bg-red-800 px-3 py-1 rounded-xl text-sm text-white">
           <div class="whitespace-nowrap font-semibold">Waduh Error</div>
           <div class="text-xs text-white/80">Boleh ulangi dengan gambar yang berbeda ya, klik kembali gambar untuk memilih gambar lainnya.</div>
+        </div>
+      </div>
+      <div v-if="true" class="flex justify-center">
+        <div class="bg-yellow-800 px-3 py-1 rounded-xl text-sm text-white">
+          <div class="whitespace-nowrap font-semibold">Download tidak didukung pada Webview</div>
+          <div class="text-xs text-white/80">Mohon untuk menggunakan browser lainnya</div>
         </div>
       </div>
       <div class="grid gap-3 md:gap-5 mt-2 text-center text-white whitespace-nowrap">
@@ -52,6 +58,8 @@ const api = useApi();
 const inputs = ref({});
 
 const isError = ref(false);
+const isToggled = ref(false);
+
 const countdown = ref(null);
 const choosedImageURL = ref(null);
 const resultURL = ref(null);
@@ -87,15 +95,23 @@ const doFilter = async () => {
 };
 
 const doDownload = () => {
+  if (isInAppBrowser.value) {
+    isToggled.value = !isToggled.value;
+    return;
+  }
   if (!resultURL.value) return;
-  window.open(resultURL.value, "_blank");
-  // const link = document.createElement("a");
-  // link.href = resultURL.value;
-  // link.download = "18+7.png"; // file name
-  // document.body.appendChild(link);
-  // link.click();
-  // document.body.removeChild(link);
+  const link = document.createElement("a");
+  link.href = resultURL.value;
+  link.download = "18+7.png"; // file name
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
 };
+
+const isInAppBrowser = computed(() => {
+  const ua = navigator.userAgent || navigator.vendor;
+  return ua.includes("Instagram") || ua.includes("FBAN") || ua.includes("FBAV");
+});
 
 function updateCountdown() {
   const now = new Date();
