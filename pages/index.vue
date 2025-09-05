@@ -1,6 +1,9 @@
 <template>
   <div class="fixed top-0 left-0 w-full h-full bg-cover" style="background-image: url('images/background.jpg')">
-    <div class="fixed grid gap-5 top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
+    <div class="fixed w-full grid gap-5 top-1/2 left-0 -translate-y-1/2">
+      <div class="mt-10 mb-3 md:mt-0 md:mb-10">
+        <WrittingTextView />
+      </div>
       <div class="grid gap-3 md:flex items-center justify-center">
         <div>
           <label for="imageUploader" class="relative block w-[300px] h-[300px] bg-white/80 rounded-xl shadow-md overflow-hidden cursor-pointer">
@@ -38,9 +41,9 @@
           <div class="text-xs text-white/80">Boleh ulangi dengan gambar yang berbeda ya, klik kembali gambar untuk memilih gambar lainnya.</div>
         </div>
       </div>
-      <div v-if="isToggled" class="flex justify-center">
+      <div v-if="isInAppBrowser" class="flex justify-center">
         <div class="bg-yellow-800 px-3 py-1 rounded-xl text-sm text-white">
-          <div class="whitespace-nowrap font-semibold">Download tidak tersedia pada Webview</div>
+          <div class="whitespace-nowrap font-semibold">Download tidak tersedia pada Web View</div>
           <div class="text-xs text-white/80">Mohon untuk menggunakan browser lainnya</div>
         </div>
       </div>
@@ -50,9 +53,9 @@
           <div class="text-xs text-white/80">Periksa galeri atau media penyimpanan anda</div>
         </div>
       </div>
-      <div class="grid gap-3 md:gap-5 mt-2 text-center text-white whitespace-nowrap">
+      <div class="w-full grid gap-3 md:gap-5 mt-2 text-center text-white whitespace-nowrap">
         <div class="font-semibold text-[20px] md:text-[40px]">{{ countdown }}</div>
-        <div class="font-bold text-[30px] md:text-[60px] leading-5">5 September 2025</div>
+        <div class="font-bold text-[30px] md:text-[60px] leading-5">31 Agustus 2026</div>
       </div>
     </div>
   </div>
@@ -67,7 +70,8 @@ const isDownloaded = ref(false);
 const isError = ref(false);
 const isToggled = ref(false);
 
-const countdown = ref(null);
+const currentTime = ref(new Date());
+
 const choosedImageURL = ref(null);
 const resultURL = ref(null);
 
@@ -125,12 +129,10 @@ const isInAppBrowser = computed(() => {
   return ua.includes("Instagram") || ua.includes("FBAN") || ua.includes("FBAV");
 });
 
-function updateCountdown() {
-  const now = new Date();
-  const year = now.getFullYear();
-  const target = new Date(`${year}-09-05T00:00:00`);
+const countdown = computed(() => {
+  const target = new Date(`2026-08-31T00:00:00`);
 
-  const diff = target - now;
+  const diff = target - currentTime.value;
 
   const seconds = Math.floor(diff / 1000) % 60;
   const minutes = Math.floor(diff / 1000 / 60) % 60;
@@ -143,12 +145,16 @@ function updateCountdown() {
   if (minutes > 0) parts.push(`${minutes} Menit`);
   if (seconds > 0) parts.push(`${seconds} Detik`);
 
-  countdown.value = parts.join(" ") + " Lagi";
-}
+  if (days + hours + minutes + seconds === 0) {
+    return null;
+  }
+
+  return parts.join(" ") + " Lagi";
+});
 
 onMounted(() => {
   setInterval(() => {
-    updateCountdown();
+    currentTime.value = new Date();
   }, 1000);
 });
 </script>
